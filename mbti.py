@@ -1,8 +1,7 @@
 from linebot.models import TextSendMessage
 from linebot import LineBotApi
 
-# LINE BOT 配置 (再次在這個檔案中初始化)
-line_bot_api = LineBotApi('YOUR_CHANNEL_ACCESS_TOKEN')  # 替換為您的 Channel Access Token
+# 不再在這裡配置 Line bot，只從 app.py 引入即可
 
 # 儲存16種MBTI類型及其回覆內容
 mbti_data = {
@@ -24,10 +23,7 @@ mbti_data = {
 }
 
 # 處理 Line 消息
-def handle_mbtimessages(event):
-    user_message = event.message.text
-    reply_token = event.reply_token
-
+def handle_mbtimessages(user_message, reply_token):
     if user_message in mbti_data:
         # 回覆MBTI類型的詳細資訊
         line_bot_api.reply_message(
