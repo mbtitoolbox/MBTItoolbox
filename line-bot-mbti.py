@@ -4,6 +4,7 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage, QuickReply, QuickReplyButton, MessageAction
 )
 
+python line-bot-mbti .py
 app = Flask(__name__)
 
 # LINE BOT 配置
