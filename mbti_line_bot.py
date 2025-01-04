@@ -1,15 +1,5 @@
-from flask import Flask, request
-from linebot import LineBotApi, WebhookHandler
-from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, QuickReply, QuickReplyButton, MessageAction
-)
-
-python line-bot-mbti .py
-app = Flask(__name__)
-
-# LINE BOT 配置
-line_bot_api = LineBotApi('ixIjKiibYZdUn4W9ZZAPS5lgAt4JAsxW/nLrnmJWfCu5Vh19nerq/nooyzzsDL0SMr/DwBq+vGhKPWA+p/yzPINc9DvoRJ4f1qWxY2eb+ujWfFPbqx+6Ra0/Jbjh0zg18fqC/Mlak61+EXFkcUECgQdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('3e49258295882026968a5788967a12f1')
+from linebot import LineBotApi
+from linebot.models import TextSendMessage, QuickReply, QuickReplyButton, MessageAction
 
 # 儲存 16 種 MBTI 類型及其回覆內容
 mbti_data = {
@@ -23,27 +13,10 @@ mbti_data = {
         "愛情": "INTJ 對愛情要求高，但願意為對的人付出深情。",
         "人生觀": "INTJ 的人生觀重視目標和效率，常以長遠眼光看待問題。"
     },
-    # 添加其他 MBTI 類型...
-    # "ESFP": {...},
-    # "ENTP": {...},
+    # 其他 MBTI 類型...
 }
 
-@app.route("/callback", methods=['POST'])
-def callback():
-    signature = request.headers['X-Line-Signature']
-    body = request.get_data(as_text=True)
-    try:
-        handler.handle(body, signature)
-    except Exception as e:
-        print(f"Error: {e}")
-    return 'OK'
-
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    user_message = event.message.text
-    reply_token = event.reply_token
-
-    # 判斷用戶輸入是否為 MBTI 類型
+def handle_mbtimessages(user_message, reply_token):
     if user_message in mbti_data:
         personality = mbti_data[user_message]
         line_bot_api.reply_message(
@@ -71,6 +44,3 @@ def handle_message(event):
             reply_token,
             TextSendMessage(text="抱歉，我不太明白你的意思。可以輸入 MBTI 類型（例如 INFP）試試看！")
         )
-
-if __name__ == "__main__":
-    app.run(port=5000)'
