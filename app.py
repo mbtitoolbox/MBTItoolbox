@@ -1,13 +1,13 @@
 from flask import Flask, request
 from linebot import LineBotApi, WebhookHandler
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
-from mbti import handle_mbtimessages  # 引入新的 MBTI 處理模組
+from mbti import handle_mbtimessages  # 引入處理 MBTI 訊息的函數
 
 app = Flask(__name__)
 
 # LINE BOT 配置
-line_bot_api = LineBotApi('YOUR_CHANNEL_ACCESS_TOKEN')  # 更換為您的 token
-handler = WebhookHandler('YOUR_CHANNEL_SECRET')  # 更換為您的 secret
+line_bot_api = LineBotApi('YOUR_CHANNEL_ACCESS_TOKEN')  # 替換為您的 Channel Access Token
+handler = WebhookHandler('YOUR_CHANNEL_SECRET')  # 替換為您的 Channel Secret
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -24,7 +24,7 @@ def handle_message(event):
     user_message = event.message.text
     reply_token = event.reply_token
     
-    # 呼叫新的處理函式來處理 MBTI 輸入
+    # 呼叫處理 MBTI 訊息的函式
     handle_mbtimessages(user_message, reply_token)
 
 if __name__ == "__main__":
