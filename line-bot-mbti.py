@@ -8,7 +8,7 @@ python line-bot-mbti .py
 app = Flask(__name__)
 
 # LINE BOT 配置
-line_bot_api = LineBotApi('No2apjWs3Zw4MJ0UFNEYQWzdD3AiRyUWpe6jnH98imAbwzyC+Og13s4I77lxzkLeMr/DwBq+vGhKPWA+p/yzPINc9DvoRJ4f1qWxY2eb+uiDVREEYH04wNpW+BLHQLD3PgcvTUxpcxHLozXB1e9ErQdB04t89/1O/w1cDnyilFU=')
+line_bot_api = LineBotApi('ixIjKiibYZdUn4W9ZZAPS5lgAt4JAsxW/nLrnmJWfCu5Vh19nerq/nooyzzsDL0SMr/DwBq+vGhKPWA+p/yzPINc9DvoRJ4f1qWxY2eb+ujWfFPbqx+6Ra0/Jbjh0zg18fqC/Mlak61+EXFkcUECgQdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('3e49258295882026968a5788967a12f1')
 
 # 儲存 16 種 MBTI 類型及其回覆內容
