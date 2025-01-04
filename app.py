@@ -6,8 +6,8 @@ from mbti import handle_mbtimessages  # 引入處理 MBTI 訊息的函數
 app = Flask(__name__)
 
 # LINE BOT 配置
-line_bot_api = LineBotApi('YOUR_CHANNEL_ACCESS_TOKEN')  # 替換為您的 Channel Access Token
-handler = WebhookHandler('YOUR_CHANNEL_SECRET')  # 替換為您的 Channel Secret
+line_bot_api = LineBotApi('LINE_CHANNEL_ACCESS_TOKEN')  # 替換為您的 Channel Access Token
+handler = WebhookHandler('LINE_CHANNEL_SECRET')  # 替換為您的 Channel Secret
 
 @app.route("/callback", methods=['POST'])
 def callback():
