@@ -20,6 +20,7 @@ VALID_MBTI_TYPES = {
     "ESFP": {"trait": "表演者，喜歡享受生活，社交能力強。", "love": "愛情中的 ESFP 喜歡浪漫，並且樂於與伴侶一起享受生活。", "work": "工作中的 ESFP 充滿活力，並且總是樂於幫助他人。", "pros_cons": "優點：社交能力強，樂觀；缺點：缺乏耐性，容易分心。", "image_url": "https://example.com/esfp.jpg"},
 }
 
+
 def handle_postback(event, line_bot_api):
     """
     處理來自用戶的 postback 消息
@@ -32,10 +33,38 @@ def handle_postback(event, line_bot_api):
     action = data[0]
     mbti_type = data[1] if len(data) > 1 else None
 
+    # 確認 MBTI 類型是否有效
     if mbti_type and mbti_type in VALID_MBTI_TYPES:
         mbti_data = VALID_MBTI_TYPES[mbti_type]
 
+        # 根據 action 做不同的回應
         if action == 'love':
             response_message = f"關於 {mbti_type} 的愛情：{mbti_data['love']}"
         elif action == 'work':
-            response_message = f"關
+            response_message = f"關於 {mbti_type} 的工作：{mbti_data['work']}"
+        elif action == 'pros_cons':
+            response_message = f"關於 {mbti_type} 的優缺點：{mbti_data['pros_cons']}"
+        else:
+            response_message = f"無效的操作，請再試一次。"
+    else:
+        response_message = "請輸入有效的 MBTI 類型，例如：ENFP、INTJ、ISFP 等。"
+
+    # 回復用戶的文字訊息
+    line_bot_api.reply_message(reply_token, TextSendMessage(text=response_message))
+
+    # 若 MBTI 類型有效，發送按鈕模板
+    if mbti_type in VALID_MBTI_TYPES:
+        mbti_image_url = VALID_MBTI_TYPES[mbti_type].get('image_url', '')  # 避免圖片 URL 不存在時出錯
+        buttons_template = ButtonsTemplate(
+            title=f"更多關於{mbti_type}",
+            text=f"想了解更多關於 {mbti_type} 的內容？",
+            thumbnail_image_url=mbti_image_url if mbti_image_url else "https://example.com/default_image.jpg",  # 使用預設圖片
+            actions=[
+                PostbackAction(label=f"想了解更多關於{mbti_type}愛情", data=f"love_{mbti_type}"),
+                PostbackAction(label=f"想了解更多關於{mbti_type}工作", data=f"work_{mbti_type}"),
+                PostbackAction(label=f"想了解{mbti_type}的優缺點", data=f"pros_cons_{mbti_type}"),
+                PostbackAction(label="想了解其他MBTI類型", data="other_mbtis")
+            ]
+        )
+        # 發送按鈕模板
+        line_bot_api.reply_message(reply_token, TemplateSendMessage(alt_text=f"更多關於{mbti_type}", template=buttons_template))
