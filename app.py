@@ -1,49 +1,34 @@
-from flask import Flask, request
+from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage, PostbackEvent, TemplateSendMessage, ButtonsTemplate, MessageAction
-from mbti import handle_mbtimessages, handle_postback  # 引入您處理MBTI和postback的函數
+from linebot.models import PostbackEvent
+from mbti import handle_postback  # 從mbti.py匯入handle_postback函數
 
 app = Flask(__name__)
 
-# LINE BOT Configuration
-line_bot_api = LineBotApi('ixIjKiibYZdUn4W9ZZAPS5lgAt4JAsxW/nLrnmJWfCu5Vh19nerq/nooyzzsDL0SMr/DwBq+vGhKPWA+p/yzPINc9DvoRJ4f1qWxY2eb+ujWfFPbqx+6Ra0/Jbjh0zg18fqC/Mlak61+EXFkcUECgQdB04t89/1O/w1cDnyilFU=')  # Replace with your Channel Access Token
-handler = WebhookHandler('3e49258295882026968a5788967a12f1')  # Replace with your Channel Secret
+# LINE BOT API 初始化
+line_bot_api = LineBotApi('YOUR_CHANNEL_ACCESS_TOKEN')  # 用您的 channel access token 替換
+handler = WebhookHandler('YOUR_CHANNEL_SECRET')  # 用您的 channel secret 替換
 
-@app.route("/")
-def home():
-    return "Hello, this is the LINE Bot server!"
-
-@app.route("/callback", methods=['POST'])
+@app.route("/callback", methods=["POST"])
 def callback():
-    signature = request.headers.get('X-Line-Signature')
+    signature = request.headers["X-Line-Signature"]
     body = request.get_data(as_text=True)
-
+    
     try:
-        handler.handle(body, signature)
-    except InvalidSignatureError:
-        return "Invalid signature", 400
+        # 驗證 LINE webhook 事件簽名
+        events = handler.parse_events_from_signature(signature, body)
+        
+        # 處理每一個事件
+        for event in events:
+            if isinstance(event, PostbackEvent):
+                # 當 postback 事件觸發時，調用 handle_postback 函數
+                handle_postback(event, line_bot_api)
     except Exception as e:
+        # 異常處理，顯示錯誤訊息
         print(f"Error: {e}")
-        return "Internal server error", 500
-
-    return 'OK'
-
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    user_message = event.message.text
-    reply_token = event.reply_token
-
-    # Call the MBTI message handler function
-    handle_mbtimessages(user_message, reply_token, line_bot_api)
-
-@handler.add(PostbackEvent)
-def handle_postback(event):
-    postback_data = event.postback.data  # 這裡會取得postback data
-    reply_token = event.reply_token
-
-    # 根據 postback 資料決定回應的內容
-    handle_postback(postback_data, reply_token, line_bot_api)
+        abort(400)
+    
+    return "OK"
 
 if __name__ == "__main__":
-    app.run(port=5000, host='0.0.0.0')
+    app.run(host="0.0.0.0", port=5000, debug=True)
