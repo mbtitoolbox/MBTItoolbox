@@ -1,38 +1,35 @@
-from linebot.models import TextSendMessage
-from linebot import LineBotApi
-
-# 不再在這裡配置 Line bot，只從 app.py 引入即可
-
-# 儲存16種MBTI類型及其回覆內容
-mbti_data = {
-    "INFP": "INFP 是個好人，富有同情心和理想主義。",
-    "ENTP": "ENTP 是富有創造力且善於辯論的人。",
-    "INTP": "INTP 是邏輯性強的思想家，喜歡探索未知。",
-    "INFJ": "INFJ 是充滿理想主義的深思熟慮者。",
-    "ENFP": "ENFP 是充滿活力的創造者，富有直覺和探索精神。",
-    "INTJ": "INTJ 是策略家，喜歡追求目標並計劃未來。",
-    "ISFP": "ISFP 是藝術家，熱愛自由且注重感官享受。",
-    "ESTP": "ESTP 是冒險者，喜歡挑戰現狀並活在當下。",
-    "ESFP": "ESFP 是表演者，喜歡社交並尋求樂趣。",
-    "ISTP": "ISTP 是技術專家，喜歡動手解決問題。",
-    "ISFJ": "ISFJ 是守護者，重視責任和他人的需求。",
-    "ESTJ": "ESTJ 是領導者，重視秩序和結構。",
-    "ESFJ": "ESFJ 是支援者，喜歡幫助他人並促進和諧。",
-    "ISTJ": "ISTJ 是負責任的執行者，重視傳統和規則。",
-    "ENFJ": "ENFJ 是導師，關心他人並鼓勵他們成長。",
+VALID_MBTI_TYPES = {
+    "INTJ": "戰略家，具有強烈的規劃能力與遠見。",
+    "INTP": "哲學家，喜歡分析與深度思考。",
+    "ENTJ": "指揮官，領導力與執行力出色。",
+    "ENTP": "辯論家，創意十足，擅長挑戰現狀。",
+    "INFJ": "提倡者，富有洞察力並關注人際關係。",
+    "INFP": "調停者，重視價值觀與內在和諧。",
+    "ENFJ": "主人公，關心他人並激勵周圍的人。",
+    "ENFP": "競選者，充滿熱情與想像力。",
+    "ISTJ": "後勤師，務實、可靠且守規矩。",
+    "ISFJ": "守護者，善良且富有責任感。",
+    "ESTJ": "總經理，擅長組織與管理。",
+    "ESFJ": "執政官，熱心助人並維持社交和諧。",
+    "ISTP": "工匠，喜歡實驗與實踐。",
+    "ISFP": "冒險家，感性且享受當下。",
+    "ESTP": "企業家，冒險精神與行動力兼具。",
+    "ESFP": "表演者，熱愛生活並傳遞歡樂。"
 }
 
-# 處理 Line 消息
-def handle_mbtimessages(user_message, reply_token):
-    if user_message in mbti_data:
-        # 回覆MBTI類型的詳細資訊
-        line_bot_api.reply_message(
-            reply_token,
-            TextSendMessage(text=mbti_data[user_message])
-        )
+def handle_mbtimessages(user_message, reply_token, line_bot_api):
+    user_message = user_message.strip().upper()
+
+    if user_message in VALID_MBTI_TYPES:
+        # Handle valid MBTI type
+        mbti_traits = VALID_MBTI_TYPES[user_message]
+        response_message = f"您是 {user_message} 類型！特質是：{mbti_traits}"
     else:
-        # 如果輸入無效，回覆提示
-        line_bot_api.reply_message(
-            reply_token,
-            TextSendMessage(text="「請輸入您的MBTI類型」")
-        )
+        # Handle invalid input
+        response_message = "請輸入您的 MBTI 類型（例如：INTJ, ENFP 等）。"
+
+    # Send the reply to the user
+    line_bot_api.reply_message(
+        reply_token,
+        TextSendMessage(text=response_message)
+    )
