@@ -6,8 +6,8 @@ from mbti import handle_postback  # Import handle_postback from mbti.py
 app = Flask(__name__)
 
 # LINE BOT API Initialization
-line_bot_api = LineBotApi('your_channel_access_token')
-handler = WebhookHandler('your_channel_secret')
+line_bot_api = LineBotApi('ixIjKiibYZdUn4W9ZZAPS5lgAt4JAsxW/nLrnmJWfCu5Vh19nerq/nooyzzsDL0SMr/DwBq+vGhKPWA+p/yzPINc9DvoRJ4f1qWxY2eb+ujWfFPbqx+6Ra0/Jbjh0zg18fqC/Mlak61+EXFkcUECgQdB04t89/1O/w1cDnyilFU=')
+handler = WebhookHandler('3e49258295882026968a5788967a12f1')
 
 @app.route("/", methods=["GET"])
 def index():
