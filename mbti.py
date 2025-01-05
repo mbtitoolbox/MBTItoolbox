@@ -131,7 +131,12 @@ def handle_postback(event, line_bot_api):
     else:
         response_message = "請輸入有效的 MBTI 類型，例如：ENFP、INTJ、ISFP 等。"
 
-    line_bot_api.reply_message(reply_token, TextSendMessage(text=response_message))
+    try:
+        # 嘗試發送訊息
+        line_bot_api.reply_message(reply_token, TextSendMessage(text=response_message))
+    except Exception as e:
+        # 如果發送訊息時出現錯誤，打印錯誤訊息
+        print(f"Error sending message: {e}")
 
     if mbti_type in VALID_MBTI_TYPES:
         mbti_image_url = VALID_MBTI_TYPES[mbti_type].get('image_url', '')  
@@ -146,4 +151,9 @@ def handle_postback(event, line_bot_api):
                 PostbackAction(label="想了解其他MBTI類型", data="other_mbtis")
             ]
         )
-        line_bot_api.reply_message(reply_token, TemplateSendMessage(alt_text=f"更多關於{mbti_type}", template=buttons_template))
+        try:
+            # 嘗試發送模板消息
+            line_bot_api.reply_message(reply_token, TemplateSendMessage(alt_text=f"更多關於{mbti_type}", template=buttons_template))
+        except Exception as e:
+            # 如果發送訊息時出現錯誤，打印錯誤訊息
+            print(f"Error sending template message: {e}")
