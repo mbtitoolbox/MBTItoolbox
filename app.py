@@ -9,6 +9,12 @@ app = Flask(__name__)
 line_bot_api = LineBotApi('YOUR_CHANNEL_ACCESS_TOKEN')  # 用您的 channel access token 替換
 handler = WebhookHandler('YOUR_CHANNEL_SECRET')  # 用您的 channel secret 替換
 
+# 根路徑處理
+@app.route('/')
+def home():
+    return "LINE Bot is running!"
+
+# 處理 LINE webhook 回調
 @app.route("/callback", methods=["POST"])
 def callback():
     signature = request.headers["X-Line-Signature"]
