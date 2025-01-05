@@ -32,7 +32,8 @@ def callback():
 # Add a handler for postback events
 @handler.add(PostbackEvent)
 def handle_postback_event(event):
-    handle_postback(event, line_bot_api)  # Pass line_bot_api to handle_postback function
+    print(f"Received postback: {event.postback.data}")  # Log postback data
+    handle_postback(event, line_bot_api)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
