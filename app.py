@@ -6,8 +6,8 @@ from mbti import handle_postback  # 從mbti.py匯入handle_postback函數
 app = Flask(__name__)
 
 # LINE BOT API 初始化
-line_bot_api = LineBotApi('YOUR_CHANNEL_ACCESS_TOKEN')  # 用您的 channel access token 替換
-handler = WebhookHandler('YOUR_CHANNEL_SECRET')  # 用您的 channel secret 替換
+line_bot_api = LineBotApi('ixIjKiibYZdUn4W9ZZAPS5lgAt4JAsxW/nLrnmJWfCu5Vh19nerq/nooyzzsDL0SMr/DwBq+vGhKPWA+p/yzPINc9DvoRJ4f1qWxY2eb+ujWfFPbqx+6Ra0/Jbjh0zg18fqC/Mlak61+EXFkcUECgQdB04t89/1O/w1cDnyilFU=')  # 用您的 channel access token 替換
+handler = WebhookHandler('3e49258295882026968a5788967a12f1')  # 用您的 channel secret 替換
 
 # 根路徑處理
 @app.route('/')
