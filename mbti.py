@@ -1,7 +1,5 @@
-
-
 from linebot.models import TextSendMessage, TemplateSendMessage, ButtonsTemplate, PostbackAction
-import json
+
 
 
 VALID_MBTI_TYPES = {
@@ -97,26 +95,17 @@ VALID_MBTI_TYPES = {
     }
 }
 
-
 def handle_postback(event, line_bot_api):
     postback_data = event.postback.data
     reply_token = event.reply_token
+    data = postback_data.split('_')
     
-    try:
-        # 嘗試解析 JSON 資料（如果是用 JSON 傳遞 postback 資料）
-        parsed_data = json.loads(postback_data)
-        action = parsed_data.get('action', None)  # 'love', 'work', 'pros_cons'
-        mbti_type = parsed_data.get('mbti_type', None)  # 'ENFP', 'INTJ', 等
-
-    except json.JSONDecodeError:
-        # 若不是 JSON 格式則直接分割資料
-        data = postback_data.split('_')
-        if len(data) > 1:
-            action = data[0]  # 'love', 'work', 'pros_cons'
-            mbti_type = data[1]  # MBTI 類型，如 'ENFP'
-        else:
-            action = None
-            mbti_type = None
+    if len(data) > 1:
+        action = data[0]  # 'love', 'work', 'pros_cons'
+        mbti_type = data[1]  # MBTI 類型，如 'ENFP'
+    else:
+        action = None
+        mbti_type = None
 
     # 檢查是否提供有效的 MBTI 類型
     if mbti_type and mbti_type in VALID_MBTI_TYPES:
