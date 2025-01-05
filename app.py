@@ -1,7 +1,7 @@
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.models import Event, MessageEvent, TextMessage, PostbackEvent
-from mbti import handle_postback  # Import handle_postback from mbti.py
+from mbti import handle_postback  # Import the handle_postback function from mbti.py
 
 app = Flask(__name__)
 
@@ -32,7 +32,7 @@ def callback():
 @handler.add(PostbackEvent)
 def handle_postback_event(event):
     print(f"Received postback: {event.postback.data}")  # Log postback data for debugging
-    handle_postback(event, line_bot_api)  # Call the handle_postback function
+    handle_postback(event, line_bot_api)  # Call the handle_postback function from mbti.py
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
