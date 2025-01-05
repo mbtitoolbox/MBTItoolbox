@@ -109,17 +109,23 @@ VALID_MBTI_TYPES = {
     }
 }
 
-
 def handle_postback(event, line_bot_api):
     postback_data = event.postback.data
     reply_token = event.reply_token
     data = postback_data.split('_')
-    action = data[0]
-    mbti_type = data[1] if len(data) > 1 else None
+    
+    if len(data) > 1:
+        action = data[0]  # 'love', 'work', 'pros_cons'
+        mbti_type = data[1]  # MBTI 類型，如 'ENFP'
+    else:
+        action = None
+        mbti_type = None
 
+    # 檢查是否提供有效的 MBTI 類型
     if mbti_type and mbti_type in VALID_MBTI_TYPES:
         mbti_data = VALID_MBTI_TYPES[mbti_type]
 
+        # 根據 action 決定回覆的內容
         if action == 'love':
             response_message = f"關於 {mbti_type} 的愛情：{mbti_data['love']}"
         elif action == 'work':
@@ -128,18 +134,12 @@ def handle_postback(event, line_bot_api):
             response_message = f"關於 {mbti_type} 的優缺點：{mbti_data['pros_cons']}"
         else:
             response_message = "無效的操作，請再試一次。"
-    else:
-        response_message = "請輸入有效的 MBTI 類型，例如：ENFP、INTJ、ISFP 等。"
-
-    try:
-        # 嘗試發送訊息
+        
+        # 發送文字訊息
         line_bot_api.reply_message(reply_token, TextSendMessage(text=response_message))
-    except Exception as e:
-        # 如果發送訊息時出現錯誤，打印錯誤訊息
-        print(f"Error sending message: {e}")
 
-    if mbti_type in VALID_MBTI_TYPES:
-        mbti_image_url = VALID_MBTI_TYPES[mbti_type].get('image_url', '')  
+        # 發送選單
+        mbti_image_url = mbti_data.get('image_url', '')  # 假設你有一個對應的圖片 URL
         buttons_template = ButtonsTemplate(
             title=f"更多關於{mbti_type}",
             text=f"想了解更多關於 {mbti_type} 的內容？",
@@ -151,9 +151,8 @@ def handle_postback(event, line_bot_api):
                 PostbackAction(label="想了解其他MBTI類型", data="other_mbtis")
             ]
         )
-        try:
-            # 嘗試發送模板消息
-            line_bot_api.reply_message(reply_token, TemplateSendMessage(alt_text=f"更多關於{mbti_type}", template=buttons_template))
-        except Exception as e:
-            # 如果發送訊息時出現錯誤，打印錯誤訊息
-            print(f"Error sending template message: {e}")
+        line_bot_api.reply_message(reply_token, TemplateSendMessage(alt_text=f"更多關於{mbti_type}", template=buttons_template))
+
+    else:
+        response_message = "請輸入有效的 MBTI 類型，例如：ENFP、INTJ、ISFP 等。"
+        line_bot_api.reply_message(reply_token, TextSendMessage(text=response_message))
