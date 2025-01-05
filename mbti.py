@@ -88,17 +88,19 @@ VALID_MBTI_TYPES = {
     }
 }
 
+
+
 def handle_mbtimessages(user_message, reply_token, line_bot_api):
     """
-    處理用戶發送的 MBTI 類型消息
+    處理用戶輸入的 MBTI 類型消息
     """
     user_message = user_message.strip().upper()
 
     if user_message in VALID_MBTI_TYPES:
-        mbti_data = VALID_MBTI_TYPES[user_message]
-        response_message = f"您是 {user_message} 類型！特質是：{mbti_data['description']}"
+        mbti_traits = VALID_MBTI_TYPES[user_message]
+        response_message = f"您是 {user_message} 類型！特質是：{mbti_traits['trait']}"
 
-        # 根據用戶輸入的MBTI類型生成按鈕模板
+        # 根據用戶輸入的MBTI生成按鈕模板
         buttons_template = ButtonsTemplate(
             title=f"更多關於{user_message}",
             text=f"想了解更多關於 {user_message} 的內容？",
@@ -123,4 +125,33 @@ def handle_mbtimessages(user_message, reply_token, line_bot_api):
         response_message = "請輸入您的 MBTI 類型（例如：INTJ, ENFP 等）。"
         line_bot_api.reply_message(reply_token, TextSendMessage(text=response_message))
 
-def handle_post
+
+def handle_postback(postback_data, reply_token, line_bot_api):
+    """
+    處理來自用戶的 postback 消息
+    """
+    data = postback_data.split('_')
+    action = data[0]
+    mbti_type = data[1] if len(data) > 1 else None
+
+    if action == 'love' and mbti_type:
+        mbti_data = VALID_MBTI_TYPES.get(mbti_type)
+        if mbti_data:
+            response_message = f"關於 {mbti_type} 的愛情：{mbti_data['love']}"
+            line_bot_api.reply_message(reply_token, TextSendMessage(text=response_message))
+    elif action == 'work' and mbti_type:
+        mbti_data = VALID_MBTI_TYPES.get(mbti_type)
+        if mbti_data:
+            response_message = f"關於 {mbti_type} 的工作：{mbti_data['work']}"
+            line_bot_api.reply_message(reply_token, TextSendMessage(text=response_message))
+    elif action == 'pros_cons' and mbti_type:
+        mbti_data = VALID_MBTI_TYPES.get(mbti_type)
+        if mbti_data:
+            response_message = f"關於 {mbti_type} 的優缺點：{mbti_data['pros_cons']}"
+            line_bot_api.reply_message(reply_token, TextSendMessage(text=response_message))
+    elif action == 'other_mbtis':
+        response_message = "您可以選擇任何一個 MBTI 類型進行查詢，例如：INTJ、ENFP 等。"
+        line_bot_api.reply_message(reply_token, TextSendMessage(text=response_message))
+    else:
+        response_message = "未識別的操作或 MBTI 類型。請再試一次。"
+        line_bot_api.reply_message(reply_token, TextSendMessage(text=response_message))
