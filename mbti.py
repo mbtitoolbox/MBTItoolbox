@@ -1,7 +1,5 @@
 from linebot.models import TextSendMessage, TemplateSendMessage, ButtonsTemplate, PostbackAction
 
-
-
 VALID_MBTI_TYPES = {
     "INTJ": {
         "trait": "戰略家，具有強烈的規劃能力與遠見。",
@@ -102,16 +100,16 @@ def handle_postback(event, line_bot_api):
     
     if len(data) > 1:
         action = data[0]  # 'love', 'work', 'pros_cons'
-        mbti_type = data[1]  # MBTI 類型，如 'ENFP'
+        mbti_type = data[1]  # MBTI type, such as 'ENFP'
     else:
         action = None
         mbti_type = None
 
-    # 檢查是否提供有效的 MBTI 類型
+    # Check if the MBTI type is valid
     if mbti_type and mbti_type in VALID_MBTI_TYPES:
         mbti_data = VALID_MBTI_TYPES[mbti_type]
 
-        # 根據 action 決定回覆的內容
+        # Choose the response based on the action
         if action == 'love':
             response_message = f"關於 {mbti_type} 的愛情：{mbti_data['love']}"
         elif action == 'work':
@@ -121,10 +119,10 @@ def handle_postback(event, line_bot_api):
         else:
             response_message = "無效的操作，請再試一次。"
         
-        # 發送文字訊息
+        # Send text response
         line_bot_api.reply_message(reply_token, TextSendMessage(text=response_message))
 
-        # 發送選單（不包含圖片）
+        # Send buttons template (menu)
         buttons_template = ButtonsTemplate(
             title=f"更多關於{mbti_type}",
             text=f"想了解更多關於 {mbti_type} 的內容？",
@@ -138,5 +136,7 @@ def handle_postback(event, line_bot_api):
         line_bot_api.reply_message(reply_token, TemplateSendMessage(alt_text=f"更多關於{mbti_type}", template=buttons_template))
 
     else:
+        # If MBTI type is invalid
         response_message = "請輸入有效的 MBTI 類型，例如：ENFP、INTJ、ISFP 等。"
         line_bot_api.reply_message(reply_token, TextSendMessage(text=response_message))
+
