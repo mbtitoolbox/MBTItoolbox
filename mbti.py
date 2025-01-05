@@ -108,8 +108,6 @@ MORE_INFO = {
         "優缺點": "優點：領導力強、果敢；缺點：有時過於冷漠、過於控制。",
     }
 }
-
-# 獲取某個MBTI類型的基本信息
 def get_basic_info(mbti_type):
     """
     根據MBTI類型返回基本信息
@@ -123,9 +121,12 @@ def get_more_info(mbti_type, info_type):
     """
     根據MBTI類型返回更多的詳細信息（愛情、工作、優缺點）
     :param mbti_type: MBTI類型（例如ENFP）
-    :param info_type: 使用者選擇的詳情類型（愛情、工作、優缺點）
-    :return: 該類型的詳細信息
+    :param info_type: 使用者選擇的詳細信息類型（例如：愛情、工作、優缺點）
+    :return: 該類型的相關信息
     """
     more_info = MORE_INFO.get(mbti_type, {})
-    return more_info.get(info_type, "未找到該類型的詳細信息")
+    
+    if info_type not in more_info:
+        return f"未找到關於{info_type}的信息"
 
+    return more_info[info_type]
