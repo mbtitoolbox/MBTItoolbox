@@ -1,3 +1,5 @@
+from linebot.models import TextSendMessage
+
 VALID_MBTI_TYPES = {
     "INTJ": "戰略家，具有強烈的規劃能力與遠見。",
     "INTP": "哲學家，喜歡分析與深度思考。",
