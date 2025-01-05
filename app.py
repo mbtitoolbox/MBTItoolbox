@@ -1,7 +1,7 @@
 from flask import Flask, request
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, PostbackEvent  # Add PostbackEvent import
 from mbti import handle_mbtimessages  # Import the MBTI message handler
 
 app = Flask(__name__)
@@ -36,10 +36,6 @@ def handle_message(event):
 
     # Call the MBTI message handler function
     handle_mbtimessages(user_message, reply_token, line_bot_api)
-
-if __name__ == "__main__":
-    app.run(port=5000, host='0.0.0.0')
-
 
 # Add a handler for postback events
 @handler.add(PostbackEvent)
