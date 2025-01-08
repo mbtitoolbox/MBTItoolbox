@@ -94,6 +94,24 @@ def handle_message(event):
 def get_mbti_info(mbti_type):
     """取得MBTI類型的基本資訊"""
     return mbti_data.get(mbti_type, {}).get('basic_info', '暫無相關資訊')
+# V6版本，試水用
+def get_category_info(mbti_type, category):
+    """根據選擇的類別返回相關的資訊"""
+    
+    # 確認資料中是否包含該類型
+    if mbti_type in mbti_data:
+        # 從該類型資料中提取 "details" 部分
+        details = mbti_data[mbti_type].get('details', {})
+        
+        # 根據分類（愛情、工作、優缺點）取得具體資料
+        if category in details:
+            return details[category]  # 返回對應的資訊
+        else:
+            return f"暫無 {category} 資訊"
+    else:
+        return f"暫無 {mbti_type} 類型的資訊"
+
+'''V5版本，先隱藏
 def get_category_info(mbti_type, category):
     """根據選擇的類別返回相關的資訊"""
     if category == "愛情":
@@ -104,6 +122,7 @@ def get_category_info(mbti_type, category):
         return mbti_data.get(mbti_type, {}).get('details', {}).get('優缺點', '暫無優缺點資訊')
     else:
         return '無效的選項'
+'''
 if __name__ == "__main__":
     app.run(port=5000)
     #app.run(host='0.0.0.0', port=5000)
