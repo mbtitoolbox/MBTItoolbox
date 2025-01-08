@@ -135,4 +135,13 @@ def get_mbti_info(mbti_type):
 
 def get_mbti_details(mbti_type, category):
     """根據MBTI類型和分類取得詳細資訊"""
-    return mbti_data.get(mbti_type, {}).get('details', {}).get(category, '暫無相關資訊')
+    # 檢查MBTI類型是否存在
+    if mbti_type not in mbti_data:
+        return f"暫無 {mbti_type} 類型的資訊，請檢查輸入是否正確"
+    
+    # 檢查類別是否存在
+    details = mbti_data[mbti_type].get('details', {}).get(category, '暫無相關資訊')
+    if details == '暫無相關資訊':
+        return f"暫無 {mbti_type} 的 {category} 資訊"
+    
+    return details
