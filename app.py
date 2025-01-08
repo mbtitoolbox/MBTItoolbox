@@ -1,76 +1,87 @@
-from flask import Flask, request, jsonify
+import os
+import logging
+from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
-from mbti import get_mbti_info, get_mbti_details
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, TemplateSendMessage, ButtonsTemplate, MessageTemplateAction
 
-# Initialize Flask app
+# 設置日誌配置
+logging.basicConfig(
+    level=logging.INFO,  # 設置日誌記錄級別
+    format='%(asctime)s - %(levelname)s - %(message)s',  # 日誌格式
+    handlers=[
+        logging.StreamHandler(),  # 輸出到控制台
+        logging.FileHandler('app.log')  # 輸出到文件
+    ]
+)
+
 app = Flask(__name__)
 
-# Line Bot configuration
-LINE_CHANNEL_ACCESS_TOKEN = 'ixIjKiibYZdUn4W9ZZAPS5lgAt4JAsxW/nLrnmJWfCu5Vh19nerq/nooyzzsDL0SMr/DwBq+vGhKPWA+p/yzPINc9DvoRJ4f1qWxY2eb+ujWfFPbqx+6Ra0/Jbjh0zg18fqC/Mlak61+EXFkcUECgQdB04t89/1O/w1cDnyilFU='
-LINE_CHANNEL_SECRET = '3e49258295882026968a5788967a12f1'
+# LINE Bot 的 Channel Access Token 和 Channel Secret
+LINE_CHANNEL_SECRET = '3e49258295882026968a5788967a12f1'  # 替換為你的 Channel Secret
+LINE_CHANNEL_ACCESS_TOKEN = 'ixIjKiibYZdUn4W9ZZAPS5lgAt4JAsxW/nLrnmJWfCu5Vh19nerq/nooyzzsDL0SMr/DwBq+vGhKPWA+p/yzPINc9DvoRJ4f1qWxY2eb+ujWfFPbqx+6Ra0/Jbjh0zg18fqC/Mlak61+EXFkcUECgQdB04t89/1O/w1cDnyilFU='  # 替換為你的 Channel Access Token
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
-# Webhook route for Line Bot
+# Webhook 端點，接收來自 LINE 伺服器的請求
 @app.route("/callback", methods=['POST'])
 def callback():
     signature = request.headers['X-Line-Signature']
     body = request.get_data(as_text=True)
     
+    logging.info("Received request body: %s", body)  # 記錄接收到的請求
     try:
         handler.handle(body, signature)
-    except InvalidSignatureError:
-        return 'Invalid signature', 400
+    except Exception as e:
+        logging.error("Error processing the request: %s", e)  # 記錄錯誤
+        abort(400)
+    return 'OK'
 
-    return 'OK', 200
 
+# 處理文本消息的事件
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    user_message = event.message.text.strip()
-    
-    valid_mbti_types = [
-        'ISTJ', 'ISFJ', 'INFJ', 'INTJ', 'ISTP', 'ISFP', 'INFP', 'INTP',
-        'ESTP', 'ESFP', 'ENFP', 'ENTP', 'ESTJ', 'ESFJ', 'ENFJ', 'ENTJ'
-    ]
-    
-    if user_message.upper() in valid_mbti_types:
-        # User input is an MBTI type
-        basic_info = get_mbti_info(user_message.upper())
-        response_message = (
-            f"這是您選擇的類型 {user_message.upper()} 的基本資訊：\n{basic_info}\n\n"
-            "請選擇下一步：\n"
-            f"1. 想了解更多關於 {user_message.upper()}\n"
-            "2. 想了解其他MBTI類型"
+    user_message = event.message.text
+    logging.info("User message: %s", user_message)  # 記錄用戶發送的消息
+
+    if user_message in mbti_data:
+        mbti_type = user_message
+        basic_info = get_mbti_info(mbti_type)
+        logging.info("Sending response: %s", basic_info)  # 記錄回應的內容
+        buttons_template = ButtonsTemplate(
+            title=f"{mbti_type} 的資訊",
+            text=basic_info,
+            actions=[
+                MessageTemplateAction(
+                    label=f'想了解更多關於{mbti_type}的愛情',
+                    text=f"更多關於 {mbti_type} 愛情"
+                ),
+                MessageTemplateAction(
+                    label=f"想了解更多關於{mbti_type}的工作",
+                    text=f"更多關於 {mbti_type} 工作"
+                )
+            ]
         )
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=response_message)
+        template_message = TemplateSendMessage(
+            alt_text='MBTI 類型資訊',
+            template=buttons_template
         )
-    elif user_message.startswith('1') or user_message.startswith('想了解更多'):
-        # User wants more details
-        mbti_type = user_message.split()[-1].upper()  # Extract MBTI type
-        options = '請選擇：愛情、工作、優缺點'
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=options)
-        )
-    elif user_message in ['愛情', '工作', '優缺點']:
-        # User selects a specific category
-        mbti_type = 'TEMP_MBTI'  # Replace this with the saved MBTI type context
-        details = get_mbti_details(mbti_type, user_message)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=f"{mbti_type} 的 {user_message} 資訊：\n{details}")
-        )
+        line_bot_api.reply_message(event.reply_token, template_message)
+
     else:
-        # Invalid input or reset
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text="請輸入正確的MBTI類型或選項！")
+            TextSendMessage(text="請輸入有效的MBTI類型，例如: INFP")
         )
+        logging.warning("User entered invalid MBTI type: %s", user_message)  # 記錄用戶輸入無效的 MBTI 類型
+
+
+def get_mbti_info(mbti_type):
+    """取得MBTI類型的基本資訊"""
+    return mbti_data.get(mbti_type, {}).get('basic_info', '暫無相關資訊')
+
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=5000)
+
+
