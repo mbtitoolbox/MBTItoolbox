@@ -83,12 +83,12 @@ def handle_message(event):
         else:
             line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text="請輸入有效的MBTI類型。")
+                TextSendMessage(text="請輸入有效的MBTI類型，並全部使用英文大寫，不可以有空格。")
             )
     else:
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text="請輸入有效的MBTI類型，例如: INFP")
+            TextSendMessage(text="請輸入有效的MBTI類型，並全部使用英文大寫，不可以有空格，例如: INFP")
         )
         logging.warning("User entered invalid MBTI type: %s", user_message)  # 記錄用戶輸入無效的 MBTI 類型
 def get_mbti_info(mbti_type):
