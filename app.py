@@ -5,7 +5,6 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, TemplateSendMessage, ButtonsTemplate, MessageTemplateAction
 from mbti import mbti_data
 
-
 # 設置日誌配置
 logging.basicConfig(
     level=logging.INFO,  # 設置日誌記錄級別
@@ -61,6 +60,10 @@ def handle_message(event):
                 MessageTemplateAction(
                     label=f"想了解更多關於{mbti_type}的工作",
                     text=f"更多關於 {mbti_type} 工作"
+                ),
+                MessageTemplateAction(
+                    label=f"想了解更多關於{mbti_type}的優缺點",
+                    text=f"更多關於 {mbti_type} 優缺點"
                 )
             ]
         )
@@ -70,6 +73,22 @@ def handle_message(event):
         )
         line_bot_api.reply_message(event.reply_token, template_message)
 
+    elif user_message.startswith("更多關於"):
+        # 用戶選擇了「愛情」、「工作」、「優缺點」選項
+        mbti_type = user_message.split(" ")[1]  # 提取MBTI類型
+        category = user_message.split(" ")[-1]  # 提取選擇的類別（愛情、工作、優缺點）
+
+        if mbti_type in mbti_data:
+            category_info = get_category_info(mbti_type, category)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=category_info)
+            )
+        else:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="請輸入有效的MBTI類型。")
+            )
     else:
         line_bot_api.reply_message(
             event.reply_token,
@@ -83,7 +102,17 @@ def get_mbti_info(mbti_type):
     return mbti_data.get(mbti_type, {}).get('basic_info', '暫無相關資訊')
 
 
+def get_category_info(mbti_type, category):
+    """根據選擇的類別返回相關的資訊"""
+    if category == "愛情":
+        return mbti_data.get(mbti_type, {}).get('love', '暫無愛情資訊')
+    elif category == "工作":
+        return mbti_data.get(mbti_type, {}).get('work', '暫無工作資訊')
+    elif category == "優缺點":
+        return mbti_data.get(mbti_type, {}).get('strengths_and_weaknesses', '暫無優缺點資訊')
+    else:
+        return '無效的選項'
+
+
 if __name__ == "__main__":
     app.run(port=5000)
-
-
