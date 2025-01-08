@@ -97,11 +97,11 @@ def get_mbti_info(mbti_type):
 def get_category_info(mbti_type, category):
     """根據選擇的類別返回相關的資訊"""
     if category == "愛情":
-        return mbti_data.get(mbti_type, {}).get('love', '暫無愛情資訊')
+        return mbti_data.get(mbti_type, {}).get('愛情', '暫無愛情資訊')
     elif category == "工作":
-        return mbti_data.get(mbti_type, {}).get('work', '暫無工作資訊')
+        return mbti_data.get(mbti_type, {}).get('工作', '暫無工作資訊')
     elif category == "優缺點":
-        return mbti_data.get(mbti_type, {}).get('strengths_and_weaknesses', '暫無優缺點資訊')
+        return mbti_data.get(mbti_type, {}).get('優缺點', '暫無優缺點資訊')
     else:
         return '無效的選項'
 if __name__ == "__main__":
