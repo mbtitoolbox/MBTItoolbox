@@ -34,10 +34,10 @@ def callback():
 def handle_message(event):
     user_message = event.message.text.strip()  # 使用者輸入的訊息
 
-    # 根據使用者輸入處理邏輯
-    if user_message in ["ENFP", "INTJ", "ISFJ"]:  # 範例 MBTI 類型
-        # 提供基本資料
-        reply_text = f"你選擇的是 {user_message}！\n{BASIC_INFO.get(user_message, '未找到該類型的基本信息')}"
+    # 判斷是否為 MBTI 類型
+    if user_message in BASIC_INFO.keys():  # 確認輸入是有效 MBTI 類型
+        # 回覆 MBTI 基本資料
+        reply_text = f"你選擇的是 {user_message}！\n{BASIC_INFO[user_message]}"
         
         # 創建按鈕選單
         buttons_template = ButtonsTemplate(
@@ -57,37 +57,31 @@ def handle_message(event):
             event.reply_token,
             [TextSendMessage(text=reply_text), template_message]
         )
+        return  # 防止進入後續邏輯
     
+    # 處理按鈕選項的選擇
+    elif user_message.startswith("愛情:") or user_message.startswith("工作:") or user_message.startswith("優缺點:"):
+        # 根據選擇的類型回覆詳細資料
+        try:
+            category, mbti_type = user_message.split(":")
+            detail_text = get_more_info(mbti_type, category)  # 從資料庫獲取詳細資訊
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=detail_text)
+            )
+        except ValueError:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="格式錯誤，請重新選擇。")
+            )
+        return
+    
+    # 當輸入無效時的回應
     else:
-        reply_text = "請輸入有效的 MBTI 類型！（例如：ENFP, INTJ, ISFJ）"
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=reply_text)
+            TextSendMessage(text="請輸入有效的 MBTI 類型！（例如：ENFP, INTJ, ISFJ）")
         )
 
-# 處理用戶選擇的選項
-@handler.add(MessageEvent, message=TextMessage)
-def handle_detail_selection(event):
-    user_message = event.message.text.strip()
 
-    # 檢查使用者選擇的內容
-    if user_message.startswith("愛情:"):
-        mbti_type = user_message.split(":")[1]
-        detail_text = get_more_info(mbti_type, "愛情")
-    elif user_message.startswith("工作:"):
-        mbti_type = user_message.split(":")[1]
-        detail_text = get_more_info(mbti_type, "工作")
-    elif user_message.startswith("優缺點:"):
-        mbti_type = user_message.split(":")[1]
-        detail_text = get_more_info(mbti_type, "優缺點")
-    else:
-        detail_text = "無效的選擇。請重新選擇。"
 
-    # 回覆詳細資料
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=detail_text)
-    )
-
-if __name__ == "__main__":
-    app.run(debug=True)
