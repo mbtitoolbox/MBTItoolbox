@@ -1,3 +1,8 @@
+# 添加按鈕選項
+def get_mbti_buttons():
+    """提供按鈕選項"""
+    return ['愛情', '工作', '優缺點']
+
 mbti_data = {
     'ISTJ': {
         'basic_info': 'ISTJ 是一個實際、守規矩且責任感強的人，注重細節和計劃。',
@@ -157,7 +162,3 @@ def get_mbti_details(mbti_type, category):
     # 返回取得的詳細資料
     return details
     
-# 添加按鈕選項
-def get_mbti_buttons():
-    """提供按鈕選項"""
-    return ['愛情', '工作', '優缺點']
