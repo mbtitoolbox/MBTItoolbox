@@ -3,6 +3,8 @@ import logging
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, TemplateSendMessage, ButtonsTemplate, MessageTemplateAction
+from mbti import mbti_data
+
 
 # 設置日誌配置
 logging.basicConfig(
