@@ -34,7 +34,7 @@ def callback():
     return 'OK'
     
 # 定期喚醒用funtion
-@app.route("/", methods=['POST'])
+@app.route("/", methods=['POST', 'GET'])
 def CronUp():
     return 'Welcome to the MBTI Bot!'
     
