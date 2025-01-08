@@ -32,6 +32,12 @@ def callback():
         logging.error("Error processing the request: %s", e)  # 記錄錯誤
         abort(400)
     return 'OK'
+    
+# 定期喚醒用funtion
+@app.route("/", methods=['POST'])
+def CronUp():
+    return 'Welcome to the MBTI Bot!'
+    
 # 處理文本消息的事件
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -99,5 +105,5 @@ def get_category_info(mbti_type, category):
     else:
         return '無效的選項'
 if __name__ == "__main__":
-    #app.run(port=5000)
-    app.run(host='0.0.0.0', port=5000)
+    app.run(port=5000)
+    #app.run(host='0.0.0.0', port=5000)
