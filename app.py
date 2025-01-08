@@ -43,12 +43,13 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_message = event.message.text
-    logging.info("User message: %s", user_message)  # 記錄用戶發送的消息
+    logging.info("User message: %s", user_message)  # Log the user's message
 
-    if user_message in mbti_data:
+    # Check if the message is a valid MBTI type
+    if is_valid_mbti(user_message):
         mbti_type = user_message
         basic_info = get_mbti_info(mbti_type)
-        logging.info("Sending response: %s", basic_info)  # 記錄回應的內容
+        logging.info("Sending response: %s", basic_info)  # Log the response content
         buttons_template = ButtonsTemplate(
             title=f"{mbti_type} 的資訊",
             text=basic_info,
@@ -73,46 +74,51 @@ def handle_message(event):
         )
         line_bot_api.reply_message(event.reply_token, template_message)
 
-    elif user_message.startswith("更多關於"):
-        # 用戶選擇了「愛情」、「工作」、「優缺點」選項
-        mbti_type = user_message.split(" ")[1]  # 提取MBTI類型
-        category = user_message.split(" ")[-1]  # 提取選擇的類別（愛情、工作、優缺點）
-
-        if mbti_type in mbti_data:
-            category_info = get_category_info(mbti_type, category)
+    elif "更多關於" in user_message:
+        # Extract the MBTI type and category (e.g., love, work, etc.)
+        mbti_type, category = parse_more_info_request(user_message)
+        if mbti_type and category:
+            detailed_info = get_mbti_detailed_info(mbti_type, category)
             line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text=category_info)
+                TextSendMessage(text=detailed_info)
             )
         else:
             line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text="請輸入有效的MBTI類型。")
+                TextSendMessage(text="無效的請求，請再試一次。")
             )
+
     else:
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="請輸入有效的MBTI類型，例如: INFP")
         )
-        logging.warning("User entered invalid MBTI type: %s", user_message)  # 記錄用戶輸入無效的 MBTI 類型
+        logging.warning("User entered invalid MBTI type: %s", user_message)
 
 
-def get_mbti_info(mbti_type):
-    """取得MBTI類型的基本資訊"""
-    return mbti_data.get(mbti_type, {}).get('basic_info', '暫無相關資訊')
+def is_valid_mbti(user_message):
+    """Check if the user input is a valid MBTI type."""
+    valid_mbti_types = ['INFP', 'INTP', 'ENFP', 'ENTP', 'ISFP', 'ISTP', 'ESFP', 'ESTP', 'INFJ', 'INTJ', 'ENFJ', 'ENTJ', 'ISFJ', 'ISTJ', 'ESFJ', 'ESTJ']
+    return user_message in valid_mbti_types
 
 
-def get_category_info(mbti_type, category):
-    """根據選擇的類別返回相關的資訊"""
-    if category == "愛情":
-        return mbti_data.get(mbti_type, {}).get('love', '暫無愛情資訊')
-    elif category == "工作":
-        return mbti_data.get(mbti_type, {}).get('work', '暫無工作資訊')
-    elif category == "優缺點":
-        return mbti_data.get(mbti_type, {}).get('strengths_and_weaknesses', '暫無優缺點資訊')
-    else:
-        return '無效的選項'
+def parse_more_info_request(user_message):
+    """Extract the MBTI type and category from the message."""
+    parts = user_message.split(' ')
+    if len(parts) >= 3:
+        mbti_type = parts[1]
+        category = parts[2]
+        return mbti_type, category
+    return None, None
 
 
-if __name__ == "__main__":
-    app.run(port=5000)
+def get_mbti_detailed_info(mbti_type, category):
+    """Return detailed information based on the MBTI type and category."""
+    # Example for extracting detailed info for categories like love, work, and strengths/weaknesses
+    category_data = {
+        '愛情': '愛情方面的詳細資料...',
+        '工作': '工作方面的詳細資料...',
+        '優缺點': '優缺點方面的詳細資料...'
+    }
+    return category_data.get(category, "未找到相關資訊")
