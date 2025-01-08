@@ -135,18 +135,29 @@ def get_mbti_info(mbti_type):
     """取得MBTI類型的基本資訊"""
     return mbti_data.get(mbti_type, {}).get('basic_info', '暫無相關資訊')
 
-# 函數來取得MBTI的詳細資訊（愛情、工作、優缺點）
 def get_mbti_details(mbti_type, category):
     """根據MBTI類型和分類取得詳細資訊"""
+    
+    # 打印查詢的MBTI類型和分類
+    print(f"查詢類型: {mbti_type}, 分類: {category}")  
+    
+    # 檢查MBTI類型是否存在於資料中
     if mbti_type not in mbti_data:
         return f"暫無 {mbti_type} 類型的資訊，請檢查輸入是否正確"
     
-    # 取出類型的詳細資訊
+    # 查看該MBTI類型是否有 'details' 鍵
+    print(f"MBTI類型資料: {mbti_data[mbti_type]}")  # 打印該類型的詳細資料
+    
+    # 嘗試取得分類資料
     details = mbti_data[mbti_type].get('details', {}).get(category, '暫無相關資訊')
+    
+    # 如果查不到分類資料，返回無相關資訊的提示
     if details == '暫無相關資訊':
         return f"暫無 {mbti_type} 的 {category} 資訊"
     
+    # 返回取得的詳細資料
     return details
+
 
 # 添加按鈕選項
 def get_mbti_buttons():
