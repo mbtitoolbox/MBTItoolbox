@@ -1,4 +1,14 @@
+from flask import Flask, request, abort
+from linebot import LineBotApi, WebhookHandler
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, QuickReply, QuickReplyButton, MessageAction
+import os
+
+app = Flask(__name__)
+
+# 1. 初始化 Line Bot API 和 WebhookHandler
+line_bot_api = LineBotApi(os.getenv('ixIjKiibYZdUn4W9ZZAPS5lgAt4JAsxW/nLrnmJWfCu5Vh19nerq/nooyzzsDL0SMr/DwBq+vGhKPWA+p/yzPINc9DvoRJ4f1qWxY2eb+ujWfFPbqx+6Ra0/Jbjh0zg18fqC/Mlak61+EXFkcUECgQdB04t89/1O/w1cDnyilFU='))
+handler = WebhookHandler(os.getenv('3e49258295882026968a5788967a12f1'))
+
 
 # 2. 處理訊息事件
 @handler.add(MessageEvent, message=TextMessage)
